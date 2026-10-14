@@ -1,0 +1,32 @@
+# systemd service for clockwork-relay, the Rooms server (see README.md).
+# Installed by install.sh; logs: journalctl -u clockwork-relay -f
+
+[Unit]
+Description=Clockwork relay (local wireless rooms)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/clockwork-relay --port 47830
+Restart=on-failure
+RestartSec=2
+
+# it only needs a UDP socket: run as a throwaway user, with nothing else writable or reachable
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+MemoryMax=64M
+
+[Install]
+WantedBy=multi-user.target
